@@ -214,7 +214,7 @@ with Meter(n_batches):
             # Currently not modeling the router network, but that
             # should be inexpensive.
             #
-            # TODO: Support for routing to multiple experts (k > ).
+            # TODO: Support for routing to multiple experts (k > 1).
             if args.consecutive_attn_and_ffn:
                 x = ffn_out.allreduce(D_FFN, rotate=(LAYER, EXPERT))
             else:
