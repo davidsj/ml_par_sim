@@ -135,11 +135,11 @@ pipeline_bubble_time = 0
 
 # Determine pipeline bubble time.
 for layer in range(pipeline_bubble_layers):
-    # FFN1
+    # First matmul.
     pipeline_bubble_time += 3*experts_per_chip*matmul_time # 1 fwd, 2 back
     # Internal reduce.
     pipeline_bubble_time += 2*allreduce(m*l*d_int * k, dp*tp*ep, tp2, chip, prec) # 1 fwd, 1 back
-    # FFN2
+    # Second matmul.
     pipeline_bubble_time += 3*experts_per_chip*matmul_time # 1 fwd, 2 back
     # External reduce.
     # For now this is simplified by the assumption ep == e.
