@@ -29,3 +29,26 @@ An example of simulating a GPT-4-like training run on A100's at 50% utilization 
     Total bytes/sec:     2.284e+14 (8.243e+13 Tx, 1.459e+14 Rx)
     
     Runtime:             118.8 days
+
+
+Alternatively, one can use `simple_transformer.py` for a similar result.
+
+    $ python3 simple_transformer.py --chip A100_40GB --n_layers 120 --d_model 12288 --batch_size 30720 --microbatch_size 48 --n_experts 16 --n_routed_experts 2 --pp 15 --pipeline_interleaving 8 --tp 8 --dp 12
+    Model Shape: 120 x (12288 x 61440) (top 2 of 16 routing)
+    Parameters: 2.90e+12, Training Tokens: 5.80e+13
+    23040 A100_40GBs
+    Pipeline steps: 15 stages x 8 interleaving; boundary interval: 1; bubble layers: 14
+    FLOP per batch: 1.37e+20
+    Matmuls per chip per layer: 2 matrices x 1 experts = 2
+    Matmul shape: 7680 d_int x 12288 d_model x 1024 tokens
+
+    BATCH TIME
+    Pipeline bubble time:    0.0273 secs
+    Pipeline full time:      9.5150 secs
+    Gradient reduction:      0.0050 secs
+    Total batch time:        9.5473 secs
+
+    Utilization:             0.9966
+
+    TOTAL RUN TIME
+    101.8 days
