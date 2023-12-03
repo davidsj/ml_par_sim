@@ -150,7 +150,7 @@ for layer in range(pipeline_bubble_layers):
     # reduce-scatter before crossing the boundary, then a bcast after
     # crossing the boundary.
     if (layer % pipe_boundary_intvl) == (pipe_boundary_intvl - 1):
-        pipeline_bubble_time += 2*tx_rx(m*l*d, dp*tp*tp2*ep, chip, prec) # 1 fwd, 1 back
+        pipeline_bubble_time += 2*tx_rx(m*l*d, dp*tp*tp2*ep, chip, prec)/2 # 1 fwd, 1 back, but we only care about the tx side
     elif (k*tp == 1) and (ep > 1):
         # There's some chance of expert-parallel communication even
         # without crossing a pipeline stage here. (If k*tp > 1 this
