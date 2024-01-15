@@ -12,7 +12,8 @@ def matmul(a, b, c, chip, base_util, precision):
     """Calculate number of FLOP and duration of a matmul of shape (a x b) x (b x c)."""
     flop = 2*a*b*c
     mem_io = a*b + b*c + a*c
-    
+
+    # TODO: Better model, taking into account L2 bandwidth and register file size.
     flop_time = flop / (base_util * chip['flop_per_sec_8bit']) * (precision/8)
     mem_io_time = mem_io / (base_util * chip['io'])
     time = max(flop_time, mem_io_time)
