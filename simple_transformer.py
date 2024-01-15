@@ -67,6 +67,10 @@ args.add_argument('--seq_len', type=int, default=2048, dest='l',
 
 # Hardware
 args.add_argument('--chip_type', type=str, default='H100', choices=chip_types.keys())
+args.add_argument('--network_bandwidth', type=float, default=None,
+                    help='network bandwidth (B/s); '
+                         'if not specified, defaults to the chip\'s network bandwidth',
+                    dest='net')
 args.add_argument('--base_utilization', type=float, default=0.6,
                     help='utilization that would be achieved by a single '
                          'matmul on a single chip')
@@ -85,9 +89,9 @@ args.add_argument('--tp2', type=int, default=1,
 
 # Parse args.
 args = args.parse_args()
-b, m, l, prec, L, d, d_internal_ratio, e, k, D, chip_type, pp, pipeline_interleaving, dp, tp, tp2, base_util = \
+b, m, l, prec, L, d, d_internal_ratio, e, k, D, chip_type, pp, pipeline_interleaving, dp, tp, tp2, base_util, net = \
     args.b, args.m, args.l, args.prec, args.L, args.d, args.d_internal_ratio, args.e, args.k, args.D, args.chip_type, args.pp, args.pipeline_interleaving, \
-    args.dp, args.tp, args.tp2, args.base_utilization
+    args.dp, args.tp, args.tp2, args.base_utilization, args.net
 d_int = d_internal_ratio*d
 ep = e # for now we assume ep == e
 p = pp * dp * tp * tp2 * ep
@@ -102,6 +106,8 @@ n_microbatches_per_batch = b // m
 D = n_batches * b*l
 chip = chip_types[args.chip_type]
 cluster_flop_per_sec = p * chip['flop_per_sec_8bit'] * base_util * (8/prec)
+if net is not None:
+    chip['net'] = net
 
 # Validate args.
 assert e % k == 0, 'routed experts must divide number of experts'
