@@ -14,7 +14,7 @@ def matmul(a, b, c, chip, base_util, precision):
     mem_io = a*b + b*c + a*c
     
     flop_time = flop / (base_util * chip['flop_per_sec_8bit']) * (precision/8)
-    mem_io_time = mem_io / chip['io']
+    mem_io_time = mem_io / (base_util * chip['io'])
     time = max(flop_time, mem_io_time)
     return flop, time
 
