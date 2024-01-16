@@ -187,8 +187,13 @@ pipeline_full_net_step_time = 0 # TODO: Figure this out.
 # Internal reduce.
 pipeline_full_net_step_time += 2*allreduce(m*l*d_int * k, dp*tp*ep, tp2, chip, prec) # 1 fwd, 1 back
 # External reduce. For now this is simplified by the assumption ep == e.
+# TODO: Separate this by forward and backward pass as the communication/computation ratios differ.
 pipeline_full_net_step_time += 2*allreduce(m*l*d, dp*tp2*ep//k, k*tp, chip, prec) # 1 fwd, 1 back
-# Not currently modeling expert or pipeline stage boundary crossing.
+if (k*tp == 1) and (ep > 1):
+    stage_crossing_fraction = 1.0
+else:
+    stage_crossing_fraction = 1/pipe_boundary_intvl
+pipeline_full_net_step_time += stage_crossing_fraction*2*tx_rx(m*l*d, dp*tp*tp2*ep, chip, prec) # 1 fwd, 1 back
 
 pipeline_full_net_time = pipeline_full_steps * pipeline_full_net_step_time
 pipeline_full_time = max(pipeline_full_flop_time, pipeline_full_net_time)
